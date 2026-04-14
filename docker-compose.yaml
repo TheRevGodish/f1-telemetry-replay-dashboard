@@ -23,9 +23,23 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana.ini:/etc/grafana/grafana.ini
     environment:
-          - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=300ms
+      - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=300ms
     depends_on:
       - influxdb
+
+  api:
+    image: f1:api
+    container_name: f1-api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - influxdb
+
+  feeder:
+    image: f1:feeder
+    container_name: f1-feeder
+    depends_on:
+      - api
 
 volumes:
   influxdb_data:

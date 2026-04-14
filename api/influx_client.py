@@ -2,7 +2,7 @@ from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import WriteOptions, SYNCHRONOUS, ASYNCHRONOUS
 from datetime import datetime
 
-INFLUXDB_URL = "http://localhost:8086"
+INFLUXDB_URL = "http://influxdb:8086"
 INFLUXDB_TOKEN = "token"
 INFLUXDB_ORG = "docs"
 INFLUXDB_BUCKET = "bucket"

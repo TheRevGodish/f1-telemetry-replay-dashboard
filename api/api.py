@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from api.influx_client import write_telemetry
+from influx_client import write_telemetry
 
 app = FastAPI()
 

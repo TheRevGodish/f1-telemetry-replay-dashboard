@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 
 CARDATA_OPENF1_URL = "https://api.openf1.org/v1/car_data"
-API_URL = "http://localhost:8000/telemetry" # envoi FastAPI
+API_URL = "http://api:8000/telemetry" # envoi FastAPI
 
 SESSION_KEY = 11245
 DRIVER_NUMBER = 10
