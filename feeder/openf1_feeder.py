@@ -13,7 +13,7 @@ START_FROM = datetime.fromisoformat("2026-03-15T06:58:00.000000+00:00")
 session = requests.Session()
 
 def fetch_telemetry() -> list:
-    print(f"Fetching telemetry data for driver: driver:{DRIVER_NUMBER}..., session:{SESSION_KEY}")
+    print(f"Fetching telemetry data for driver: driver:{DRIVER_NUMBER}, session:{SESSION_KEY}")
     response = requests.get(CARDATA_OPENF1_URL, params={
         'session_key': SESSION_KEY,
         'driver_number': DRIVER_NUMBER
