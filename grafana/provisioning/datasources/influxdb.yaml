@@ -1,0 +1,20 @@
+# Grafana datasource provisioning (loaded automatically at container startup).
+# This replaces the manual "Add data source" clicking in the Grafana UI.
+# Docs: https://grafana.com/docs/grafana/latest/administration/provisioning/#data-sources
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB
+    uid: influxdb-f1          # stable UID → the dashboard JSON references this
+    type: influxdb
+    access: proxy             # Grafana (server-side) calls InfluxDB, not the browser
+    url: http://influxdb:8086 # service name inside the Docker network, never localhost
+    isDefault: true
+    jsonData:
+      version: Flux           # we query in Flux, not InfluxQL
+      organization: docs
+      defaultBucket: bucket
+      tlsSkipVerify: true
+    secureJsonData:
+      token: token            # dev token from docker-compose (externalise later)
+    editable: true

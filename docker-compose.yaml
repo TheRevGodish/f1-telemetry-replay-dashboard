@@ -1,0 +1,95 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=f1user
+      - POSTGRES_PASSWORD=f1password
+      - POSTGRES_DB=f1data
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./ingest/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=password
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+  influxdb:
+    image: influxdb:2
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=password
+      - DOCKER_INFLUXDB_INIT_ORG=docs
+      - DOCKER_INFLUXDB_INIT_BUCKET=bucket
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=token
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=300ms
+    depends_on:
+      - influxdb
+
+  api:
+    image: f1:api
+    container_name: f1-api
+    ports:
+      - "8000:8000"
+    environment:
+      # /track reads the circuit outline from Postgres (reached by service name).
+      - DB_DSN=postgresql://f1user:f1password@postgres:5432/f1data
+    depends_on:
+      - influxdb
+      - postgres
+
+  feeder:
+    image: f1:feeder
+    container_name: f1-feeder
+    depends_on:
+      - api
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: f1-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - api
+
+volumes:
+  influxdb_data:
+  grafana_data:
+  postgres_data:
+  pgadmin_data:

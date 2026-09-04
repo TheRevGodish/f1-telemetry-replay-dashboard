@@ -1,0 +1,16 @@
+# Dev image: runs the Vite dev server with hot-reload
+# The source is bind-mounted at runtime (see docker-compose), so this image only
+# needs to exist to install node_modules and start the server
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy manifests first so `npm install` is cached unless dependencies change
+COPY package.json package-lock.json* ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 5173
+
+CMD ["npm", "run", "dev"]
